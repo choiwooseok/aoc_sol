@@ -76,14 +76,8 @@ std::vector<std::string> filter(std::vector<std::string>& data, int idx, bool mo
     char target;
     if(most) {
         target = zeros > ones ? '0' : '1';
-        if(zeros == ones) {
-            target = '1';
-        }
     } else {
         target = zeros > ones ? '1' : '0';
-        if(zeros == ones) {
-            target = '0';
-        }
     }
 
     std::vector<std::string> filtered;
@@ -93,7 +87,6 @@ std::vector<std::string> filter(std::vector<std::string>& data, int idx, bool mo
             filtered.push_back(elem);
         }
     }
-
 
     // for(auto& elem : filtered) {
     //     std::cout << elem << " ";
