@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <queue>
 #include <map>
 
 std::vector<std::string> readInputs(const std::string& fileName) {
