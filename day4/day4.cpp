@@ -19,6 +19,27 @@ std::vector<std::string> readInputs(const std::string& fileName) {
     return data;
 }
 
+void dataManipulate(std::vector<std::string>& data, std::queue<std::string>& drawNumbersQueue, std::vector<std::vector<std::vector<std::pair<std::string, bool> > > >& boards) {
+    std::stringstream ss(data[0]);
+    std::string temp;
+
+    while (getline(ss, temp, ',')) {
+        drawNumbersQueue.push(temp);
+    }
+
+    for(int i = 1; i < data.size(); i += 25) {
+        std::vector<std::vector<std::pair<std::string, bool> > > board = 
+        {
+            { { data[i     ], false }, { data[i +  1], false }, { data[i +  2], false }, { data[i +  3], false }, { data[i +  4], false } },
+            { { data[i +  5], false }, { data[i +  6], false }, { data[i +  7], false }, { data[i +  8], false }, { data[i +  9], false } },
+            { { data[i + 10], false }, { data[i + 11], false }, { data[i + 12], false }, { data[i + 13], false }, { data[i + 14], false } },
+            { { data[i + 15], false }, { data[i + 16], false }, { data[i + 17], false }, { data[i + 18], false }, { data[i + 19], false } },
+            { { data[i + 20], false }, { data[i + 21], false }, { data[i + 22], false }, { data[i + 23], false }, { data[i + 24], false } }
+        };
+        boards.push_back(board);
+    }
+}
+
 void printBoard(std::vector<std::vector<std::pair<std::string, bool> > >& board ) {
     for(auto row : board) {
         for(auto col : row) {
@@ -42,25 +63,10 @@ int getUnmarkedSum(const std::vector<std::vector<std::pair<std::string, bool> > 
 }
 
 void part1(std::vector<std::string>& data) {
-    std::stringstream ss(data[0]);
-    std::string temp;
     std::queue<std::string> drawNumbersQueue;
-    while (getline(ss, temp, ',')) {
-        drawNumbersQueue.push(temp);
-    }
-
     std::vector<std::vector<std::vector<std::pair<std::string, bool> > > > boards;
-    for(int i = 1; i < data.size(); i += 25) {
-        std::vector<std::vector<std::pair<std::string, bool> > > board = 
-        {
-            { { data[i     ], false }, { data[i +  1], false }, { data[i +  2], false }, { data[i +  3], false }, { data[i +  4], false } },
-            { { data[i +  5], false }, { data[i +  6], false }, { data[i +  7], false }, { data[i +  8], false }, { data[i +  9], false } },
-            { { data[i + 10], false }, { data[i + 11], false }, { data[i + 12], false }, { data[i + 13], false }, { data[i + 14], false } },
-            { { data[i + 15], false }, { data[i + 16], false }, { data[i + 17], false }, { data[i + 18], false }, { data[i + 19], false } },
-            { { data[i + 20], false }, { data[i + 21], false }, { data[i + 22], false }, { data[i + 23], false }, { data[i + 24], false } }
-        };
-        boards.push_back(board);
-    }
+
+    dataManipulate(data, drawNumbersQueue, boards);
 
     bool hasWinner = false;
     std::vector<std::vector<std::pair<std::string, bool> > > winningBoard;
@@ -116,25 +122,9 @@ void part1(std::vector<std::string>& data) {
 }
 
 void part2(std::vector<std::string>& data) {
-    std::stringstream ss(data[0]);
-    std::string temp;
     std::queue<std::string> drawNumbersQueue;
-    while (getline(ss, temp, ',')) {
-        drawNumbersQueue.push(temp);
-    }
-
     std::vector<std::vector<std::vector<std::pair<std::string, bool> > > > boards;
-    for(int i = 1; i < data.size(); i += 25) {
-        std::vector<std::vector<std::pair<std::string, bool> > > board = 
-        {
-            { { data[i     ], false }, { data[i +  1], false }, { data[i +  2], false }, { data[i +  3], false }, { data[i +  4], false } },
-            { { data[i +  5], false }, { data[i +  6], false }, { data[i +  7], false }, { data[i +  8], false }, { data[i +  9], false } },
-            { { data[i + 10], false }, { data[i + 11], false }, { data[i + 12], false }, { data[i + 13], false }, { data[i + 14], false } },
-            { { data[i + 15], false }, { data[i + 16], false }, { data[i + 17], false }, { data[i + 18], false }, { data[i + 19], false } },
-            { { data[i + 20], false }, { data[i + 21], false }, { data[i + 22], false }, { data[i + 23], false }, { data[i + 24], false } }
-        };
-        boards.push_back(board);
-    }
+    dataManipulate(data, drawNumbersQueue, boards);
 
     bool hasWinner = false;
     bool lastBoardFin = false;
@@ -185,17 +175,13 @@ void part2(std::vector<std::string>& data) {
                         lastBoard = boards[k];
                         lastBoardFin = true;
                         break;
-                    } else {
-                        std::cout << alreadyWin.size() << ", " <<  boards.size() << std::endl;
                     }
                 }
             }
         }
 
         if(lastBoardFin) {
-            std::cout << "==========================" << std::endl;
             printBoard(lastBoard);
-            std::cout << "==========================" << std::endl;
             break;
         }
         drawNumbersQueue.pop();
@@ -209,7 +195,7 @@ void part2(std::vector<std::string>& data) {
 int main(int argc, char** argv) {
     // std::vector<std::string> data = readInputs("day4_test.txt");
     std::vector<std::string> data = readInputs("day4_input.txt");
-    // part1(data);
+    part1(data);
     part2(data);
     return 0;
 }
