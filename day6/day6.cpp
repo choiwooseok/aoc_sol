@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <array>
+#include <numeric>
+#include <algorithm>
 
 std::vector<int> readInputs(const std::string& fileName) {
     std::fstream inputs(fileName);
@@ -39,15 +42,26 @@ void part1(std::vector<int>& data, int& days) {
     }
 }
 
-void part2(std::vector<int>& data, int& days) {
+void part2(std::vector<int>& data, int days) {
+    std::array<int64_t, 9> lanternfish = {0ll,};
+    for(auto& elem : data) {
+        lanternfish[elem]++;
+    }
+
+    for(int i = 0; i < days; i++) {
+        int64_t creation = lanternfish.front();
+        std::rotate(lanternfish.begin(), lanternfish.begin() + 1 , lanternfish.end());
+        lanternfish[6] += creation;
+    }
+
+    std::cout << std::accumulate(lanternfish.begin(), lanternfish.end(), 0ll) << std::endl;
 }
 
 int main(int argc, char** argv) {
-    std::vector<int> data = readInputs("day6_test.txt");
-    // std::vector<int> data = readInputs("day6_input.txt");
-    int targetDays = 80;
-    part1(data, targetDays);
-
-    // part2(data, targetDays);
+    // std::vector<int> data = readInputs("day6_test.txt");
+    std::vector<int> data = readInputs("day6_input.txt");
+    part2(data, 18);
+    part2(data, 80);
+    part2(data, 256);
     return 0;
 }
