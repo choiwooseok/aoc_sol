@@ -4,37 +4,36 @@
 #include <sstream>
 #include <set>
 
-std::vector<std::pair<std::string, std::string> > readInputs(const std::string &fileName) {
-    std::fstream inputs(fileName);
-    std::vector<std::pair<std::string, std::string> > data;
+std::vector<std::pair<std::string, std::string> > readInputs(const std::string& fileName) {
+  std::fstream inputs(fileName);
+  std::vector<std::pair<std::string, std::string> > data;
 
-    std::string delim = "|";
-    
-    std::string temp;
-    while (getline(inputs, temp)) {
-        // patterns         // signals
-        data.push_back({temp.substr(0, temp.find(delim) - 1), temp.substr(temp.find(delim) + 2)});
-    }
+  std::string delim = "|";
 
-    inputs.close();
-    return data;
+  std::string temp;
+  while (getline(inputs, temp)) {
+    data.push_back({temp.substr(0, temp.find(delim) - 1), temp.substr(temp.find(delim) + 2)});
+  }
+
+  inputs.close();
+  return data;
 }
 
 void part1(std::vector<std::pair<std::string, std::string> >& data) {
-    // 2, 4, 3, 7
-    int cnt = 0;
-    for(const auto& elem : data) {
-        std::string signals = elem.second;
-        std::stringstream ss(signals);
-        std::string temp;
-        while(ss.good()) {
-            ss >> temp;
-            if(temp.length() == 2 || temp.length() == 4 || temp.length() == 3 || temp.length() == 7) {
-                cnt++;
-            }
-        }
+  // 2, 4, 3, 7
+  int cnt = 0;
+  for (const auto& elem : data) {
+    std::string signals = elem.second;
+    std::stringstream ss(signals);
+    std::string temp;
+    while (ss.good()) {
+      ss >> temp;
+      if (temp.length() == 2 || temp.length() == 4 || temp.length() == 3 || temp.length() == 7) {
+        cnt++;
+      }
     }
-    std::cout << cnt << std::endl;
+  }
+  std::cout << cnt << std::endl;
 }
 
 // std::set<char> one =    {          'c',           'f'     };
@@ -67,10 +66,10 @@ void part1(std::vector<std::pair<std::string, std::string> >& data) {
 void part2(std::vector<std::pair<std::string, std::string> >& data) {
 }
 
-int main(int argc, char **argv) {
-    // std::vector<std::pair<std::string, std::string> > data = readInputs("day8_test.txt");
-    std::vector<std::pair<std::string, std::string> > data = readInputs("day8_input.txt");
-    part1(data);
-    part2(data);
-    return 0;
+int main(int argc, char** argv) {
+  // std::vector<std::pair<std::string, std::string> > data = readInputs("day8_test.txt");
+  std::vector<std::pair<std::string, std::string> > data = readInputs("day8_input.txt");
+  part1(data);
+  part2(data);
+  return 0;
 }
