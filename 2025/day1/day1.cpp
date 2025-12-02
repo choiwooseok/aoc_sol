@@ -3,16 +3,13 @@
 #include <fstream>
 #include <string>
 
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
+std::vector<std::string> read_lines(const std::string& fileName) {
+  std::fstream fs(fileName);
+  std::vector<std::string> lines;
   std::string curr;
-  while (std::getline(inputs, curr)) {
-    data.push_back(curr);
-  }
-  inputs.close();
-  return data;
+  while (std::getline(fs, curr)) lines.push_back(curr);
+  fs.close();
+  return lines;
 }
 
 enum class Direction {
@@ -74,7 +71,7 @@ int part2(int start, const std::vector<std::string>& instructions) {
 }
 
 int main(int argc, char** argv) {
-  auto instructions = readInputs("input.txt");
+  auto instructions = read_lines("input.txt");
   std::cout << "part1 : " << part1(50, instructions) << std::endl;
   std::cout << "part2 : " << part2(50, instructions) << std::endl;
   return 0;

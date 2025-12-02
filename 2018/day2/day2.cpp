@@ -4,16 +4,13 @@
 #include <string>
 #include <unordered_map>
 
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
+std::vector<std::string> read_lines(const std::string& fileName) {
+  std::fstream fs(fileName);
+  std::vector<std::string> lines;
   std::string curr;
-  while (std::getline(inputs, curr)) {
-    data.push_back(curr);
-  }
-  inputs.close();
-  return data;
+  while (std::getline(fs, curr)) lines.push_back(curr);
+  fs.close();
+  return lines;
 }
 
 int part1(const std::vector<std::string>& lines) {
@@ -63,7 +60,7 @@ std::string part2(const std::vector<std::string>& lines) {
 }
 
 int main(int argc, char** argv) {
-  auto lines = readInputs("input.txt");
+  auto lines = read_lines("input.txt");
   std::cout << "part1 : " << part1(lines) << std::endl;
   std::cout << "part2 : " << part2(lines) << std::endl;
   return 0;
