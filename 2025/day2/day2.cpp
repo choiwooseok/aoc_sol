@@ -121,10 +121,23 @@ uint64_t part2(const std::string& line) {
 }
 
 int main(int argc, char** argv) {
-  auto line = read_line("input.txt");
+  using namespace std::chrono;
 
-  std::cout << std::format("part1 : {}\n", part1(line));
-  std::cout << std::format("part2 : {}\n", part2(line));
+  auto line = read_line("day2/input.txt");
+
+  {
+    auto begin = system_clock::now();
+    std::cout << std::format("part1 : {}\n", part1(line));
+    auto end = system_clock::now();
+    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+  }
+
+  {
+    auto begin = system_clock::now();
+    std::cout << std::format("part2 : {}\n", part2(line));
+    auto end = system_clock::now();
+    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+  }
 
   return 0;
 }

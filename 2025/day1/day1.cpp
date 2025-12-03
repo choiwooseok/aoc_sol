@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <chrono>
 
 std::vector<std::string> read_lines(const std::string& fileName) {
   std::fstream fs(fileName);
@@ -71,8 +72,23 @@ int part2(int start, const std::vector<std::string>& instructions) {
 }
 
 int main(int argc, char** argv) {
-  auto instructions = read_lines("input.txt");
-  std::cout << "part1 : " << part1(50, instructions) << std::endl;
-  std::cout << "part2 : " << part2(50, instructions) << std::endl;
+  using namespace std::chrono;
+
+  auto instructions = read_lines("day1/input.txt");
+
+  {
+    auto begin = system_clock::now();
+    std::cout << "part1 : " << part1(50, instructions) << std::endl;
+    auto end = system_clock::now();
+    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+  }
+
+  {
+    auto begin = system_clock::now();
+    std::cout << "part2 : " << part2(50, instructions) << std::endl;
+    auto end = system_clock::now();
+    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+  }
+
   return 0;
 }
