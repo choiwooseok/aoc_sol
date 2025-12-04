@@ -1,17 +1,5 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
-#include <chrono>
-
-std::vector<std::string> read_lines(const std::string& fileName) {
-  std::fstream fs(fileName);
-  std::vector<std::string> lines;
-  std::string curr;
-  while (std::getline(fs, curr)) lines.push_back(curr);
-  fs.close();
-  return lines;
-}
+#include "../util.h"
 
 enum class Direction {
   LEFT,
@@ -72,22 +60,16 @@ int part2(int start, const std::vector<std::string>& instructions) {
 }
 
 int main(int argc, char** argv) {
-  using namespace std::chrono;
-
   auto instructions = read_lines("day1/input.txt");
 
   {
-    auto begin = system_clock::now();
-    std::cout << "part1 : " << part1(50, instructions) << std::endl;
-    auto end = system_clock::now();
-    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+    auto [result, ms] = measure_ms(part1, 50, instructions);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   {
-    auto begin = system_clock::now();
-    std::cout << "part2 : " << part2(50, instructions) << std::endl;
-    auto end = system_clock::now();
-    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+    auto [result, ms] = measure_ms(part2, 50, instructions);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   return 0;

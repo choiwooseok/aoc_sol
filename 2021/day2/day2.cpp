@@ -1,6 +1,6 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
+#include <format>
+#include "../util.h"
 
 enum class Command {
   FORWARD,
@@ -20,7 +20,7 @@ Command fromStr(const std::string& str) {
   }
 }
 
-std::vector<std::pair<Command, int>> readInputs(const std::string& fileName) {
+std::vector<std::pair<Command, int>> _parse(const std::string& fileName) {
   std::fstream inputs(fileName);
   std::vector<std::pair<Command, int>> data;
 
@@ -35,7 +35,7 @@ std::vector<std::pair<Command, int>> readInputs(const std::string& fileName) {
   return data;
 }
 
-void part1(std::vector<std::pair<Command, int>>& data) {
+int part1(std::vector<std::pair<Command, int>>& data) {
   int horizontalPosition = 0;
   int depth = 0;
   for (auto elem : data) {
@@ -54,10 +54,10 @@ void part1(std::vector<std::pair<Command, int>>& data) {
         break;
     }
   }
-  std::cout << horizontalPosition * depth << std::endl;
+  return horizontalPosition * depth;
 }
 
-void part2(std::vector<std::pair<Command, int>>& data) {
+int part2(std::vector<std::pair<Command, int>>& data) {
   int horizontalPosition = 0;
   int depth = 0;
   int aim = 0;
@@ -77,15 +77,22 @@ void part2(std::vector<std::pair<Command, int>>& data) {
       default:
         break;
     }
-    std::cout << horizontalPosition << " " << depth << " " << aim << std::endl;
   }
-  std::cout << horizontalPosition * depth << std::endl;
+  return horizontalPosition * depth;
 }
 
 int main(int argc, char** argv) {
-  // std::vector<std::pair<Command, int>> data = readInputs("day2_test.txt");
-  std::vector<std::pair<Command, int>> data = readInputs("day2_input.txt");
-  // part1(data);
-  part2(data);
+  std::vector<std::pair<Command, int>> data = _parse("day2/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

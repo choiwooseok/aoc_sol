@@ -1,18 +1,6 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
 #include <format>
-#include <chrono>
-
-std::vector<std::string> read_lines(const std::string& fileName) {
-  std::fstream fs(fileName);
-  std::vector<std::string> lines;
-  std::string curr;
-  while (std::getline(fs, curr)) lines.push_back(curr);
-  fs.close();
-  return lines;
-}
+#include "../util.h"
 
 // slow
 // int part1(const std::vector<std::string>& lines) {
@@ -133,22 +121,16 @@ uint64_t backtrack_greedy(const std::vector<std::string>& lines, int need) {
 }
 
 int main(int argc, char** argv) {
-  using namespace std::chrono;
-
   auto lines = read_lines("day3/input.txt");
 
   {
-    auto begin = system_clock::now();
-    std::cout << std::format("part1 : {}\n", backtrack_greedy(lines, 2));
-    auto end = system_clock::now();
-    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+    auto [result, ms] = measure_ms(backtrack_greedy, lines, 2);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   {
-    auto begin = system_clock::now();
-    std::cout << std::format("part2 : {}\n", backtrack_greedy(lines, 12));
-    auto end = system_clock::now();
-    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+    auto [result, ms] = measure_ms(backtrack_greedy, lines, 12);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   return 0;

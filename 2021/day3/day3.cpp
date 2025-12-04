@@ -1,20 +1,8 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
+#include <format>
 #include <map>
 
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
-  std::string line;
-  while (!inputs.eof()) {
-    inputs >> line;
-    data.push_back(line);
-  }
-  inputs.close();
-  return data;
-}
+#include "../util.h"
 
 int binaryToDecimal(const std::string& n) {
   std::string num = n;
@@ -60,10 +48,10 @@ std::pair<std::string, std::string> getGammaNEpsilon(std::map<int, std::pair<int
   return {gamma, epsilon};
 }
 
-void part1(std::vector<std::string>& data) {
+int part1(std::vector<std::string>& data) {
   std::map<int, std::pair<int, int> > counts = countHelper(data);
   std::pair<std::string, std::string> ge = getGammaNEpsilon(counts);
-  std::cout << binaryToDecimal(ge.first) * binaryToDecimal(ge.second) << std::endl;
+  return binaryToDecimal(ge.first) * binaryToDecimal(ge.second);
 }
 
 std::vector<std::string> filter(std::vector<std::string>& data, int idx, bool most) {
@@ -89,7 +77,7 @@ std::vector<std::string> filter(std::vector<std::string>& data, int idx, bool mo
   return filtered;
 }
 
-void part2(std::vector<std::string>& data) {
+int part2(std::vector<std::string>& data) {
   int idx = 0;
   std::vector<std::string> oxy = filter(data, idx, true);
   idx++;
@@ -106,12 +94,21 @@ void part2(std::vector<std::string>& data) {
     idx++;
   }
 
-  std::cout << binaryToDecimal(oxy[0]) * binaryToDecimal(co2[0]) << std::endl;
+  return binaryToDecimal(oxy[0]) * binaryToDecimal(co2[0]);
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::string> data = readInputs("day3_input.txt");
-  part1(data);
-  part2(data);
+  std::vector<std::string> data = read_lines("day3/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

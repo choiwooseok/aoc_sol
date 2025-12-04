@@ -1,12 +1,12 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
 #include <limits>
 #include <cmath>
 #include <numeric>
 #include <algorithm>
 
-std::vector<int> readInputs(const std::string& fileName) {
+#include "../util.h"
+
+std::vector<int> _parse(const std::string& fileName) {
   std::fstream inputs(fileName);
   std::vector<int> data;
 
@@ -19,7 +19,7 @@ std::vector<int> readInputs(const std::string& fileName) {
   return data;
 }
 
-void part1(std::vector<int>& data) {
+int part1(std::vector<int>& data) {
   auto fuels = std::numeric_limits<int>::max();
   for (int i = 0; i < data.size(); i++) {
     int temp = 0;
@@ -32,7 +32,7 @@ void part1(std::vector<int>& data) {
     }
   }
 
-  std::cout << fuels << std::endl;
+  return fuels;
 }
 
 int64_t part2_helper(std::vector<int>& data, int64_t target) {
@@ -44,7 +44,7 @@ int64_t part2_helper(std::vector<int>& data, int64_t target) {
   return fuels;
 }
 
-void part2(std::vector<int>& data) {
+int64_t part2(std::vector<int>& data) {
   int64_t min = *std::min_element(data.begin(), data.end());
   int64_t max = *std::max_element(data.begin(), data.end());
 
@@ -52,13 +52,21 @@ void part2(std::vector<int>& data) {
   for (int64_t i = min; i <= max; i++) {
     ret = std::min(ret, part2_helper(data, i));
   }
-  std::cout << ret << std::endl;
+  return ret;
 }
 
 int main(int argc, char** argv) {
-  // std::vector<int> data = readInputs("day7_test.txt");
-  std::vector<int> data = readInputs("day7_input.txt");
-  part1(data);
-  part2(data);
+  std::vector<int> data = _parse("day7/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

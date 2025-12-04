@@ -1,41 +1,103 @@
 #include <iostream>
-#include <fstream>
-#include <string>
 #include <map>
 #include <set>
+#include <format>
+#include <queue>
 
-std::map<std::string, std::set<std::string> > inputs;
+#include "../util.h"
 
-int count(const std::string& node, int lvl) {
-  int cnt = lvl;
-  for (auto& elem : inputs[node]) {
-    cnt += count(elem, lvl + 1);
+std::map<std::string, std::vector<std::string>> build_graph(const std::vector<std::string>& lines) {
+  std::map<std::string, std::vector<std::string>> graph;
+  for (const auto& line : lines) {
+    int idx = line.find(')');
+    std::string parent = line.substr(0, idx);
+    std::string child = line.substr(idx + 1);
+    graph[parent].push_back(child);
+    graph[child].push_back(parent);  // 양방향
   }
-  return cnt;
+  return graph;
 }
 
-void printDirect() {
-  for (auto& input : inputs) {
-    std::cout << input.first << " : ";
-    for (auto& elem : input.second) {
-      std::cout << elem << " ";
+// BFS로 각 노드의 깊이 계산 (COM에서부터)
+int part1(const std::vector<std::string>& lines) {
+  auto graph = build_graph(lines);
+
+  std::queue<std::pair<std::string, int>> q;
+  std::set<std::string> visited;
+  int total_orbits = 0;
+
+  q.push({"COM", 0});
+  visited.insert("COM");
+
+  while (!q.empty()) {
+    auto [current, depth] = q.front();
+    q.pop();
+
+    total_orbits += depth;
+
+    for (const auto& neighbor : graph.at(current)) {
+      if (visited.find(neighbor) == visited.end()) {
+        visited.insert(neighbor);
+        q.push({neighbor, depth + 1});
+      }
     }
-    std::cout << std::endl;
   }
+
+  return total_orbits;
+}
+
+// BFS
+int part2(const std::vector<std::string>& lines) {
+  auto graph = build_graph(lines);
+
+  // BFS: YOU가 궤도하는 객체에서 시작, SAN이 궤도하는 객체에 도달할 때까지
+  std::string start_node;
+  std::string end_node;
+
+  for (const auto& [node, neighbors] : graph) {
+    for (const auto& neighbor : neighbors) {
+      if (neighbor == "YOU") start_node = node;
+      if (neighbor == "SAN") end_node = node;
+    }
+  }
+
+  std::queue<std::pair<std::string, int>> q;
+  std::set<std::string> visited;
+
+  q.push({start_node, 0});
+  visited.insert(start_node);
+
+  while (!q.empty()) {
+    auto [current, distance] = q.front();
+    q.pop();
+
+    if (current == end_node) {
+      return distance;
+    }
+
+    for (const auto& neighbor : graph.at(current)) {
+      if (visited.find(neighbor) == visited.end()) {
+        visited.insert(neighbor);
+        q.push({neighbor, distance + 1});
+      }
+    }
+  }
+
+  return -1;  // 경로 없음
 }
 
 int main(int argc, char** argv) {
-  bool isTest = true;
-  std::fstream fs(isTest ? "test.txt" : "input.txt");
-  std::string tmp;
-  while (std::getline(fs, tmp)) {
-    int idx = tmp.find(')');
-    std::string first = tmp.substr(0, idx);
-    std::string second = tmp.substr(idx + 1);
-    inputs[first].insert(second);
+  auto lines = read_lines("day6/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, lines);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
   }
-  std::cout << count("COM", 0) << std::endl;
-  fs.close();
-  // printDirect();
+
+  {
+    auto [result, ms] = measure_ms(part2, lines);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

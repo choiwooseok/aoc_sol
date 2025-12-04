@@ -1,17 +1,6 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
 #include <unordered_map>
-
-std::vector<std::string> read_lines(const std::string& fileName) {
-  std::fstream fs(fileName);
-  std::vector<std::string> lines;
-  std::string curr;
-  while (std::getline(fs, curr)) lines.push_back(curr);
-  fs.close();
-  return lines;
-}
+#include "../util.h"
 
 int part1(const std::vector<std::string>& lines) {
   int two = 0;
@@ -60,8 +49,17 @@ std::string part2(const std::vector<std::string>& lines) {
 }
 
 int main(int argc, char** argv) {
-  auto lines = read_lines("input.txt");
-  std::cout << "part1 : " << part1(lines) << std::endl;
-  std::cout << "part2 : " << part2(lines) << std::endl;
+  auto lines = read_lines("day2/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, lines);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, lines);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

@@ -1,20 +1,10 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
 #include <sstream>
 #include <unordered_set>
 #include <cstdint>
-#include <chrono>
 #include <numeric>
 #include <format>
-
-std::string read_line(const std::string& fileName) {
-  std::ifstream fs(fileName);
-  std::string curr;
-  std::getline(fs, curr);
-  return curr;
-}
+#include "../util.h"
 
 static uint64_t pow10(int k) {
   uint64_t r = 1;
@@ -121,22 +111,16 @@ uint64_t part2(const std::string& line) {
 }
 
 int main(int argc, char** argv) {
-  using namespace std::chrono;
-
   auto line = read_line("day2/input.txt");
 
   {
-    auto begin = system_clock::now();
-    std::cout << std::format("part1 : {}\n", part1(line));
-    auto end = system_clock::now();
-    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+    auto [result, ms] = measure_ms(part1, line);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   {
-    auto begin = system_clock::now();
-    std::cout << std::format("part2 : {}\n", part2(line));
-    auto end = system_clock::now();
-    std::cout << std::format(" - elapsed : {} ms\n", duration_cast<milliseconds>(end - begin).count());
+    auto [result, ms] = measure_ms(part2, line);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   return 0;

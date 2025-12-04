@@ -1,13 +1,9 @@
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include <algorithm>
 
-void part1() {
-  std::ifstream in("input.txt");
-  std::string input;
-  in >> input;
+#include "../util.h"
+
+int part1(const std::string& input) {
   int width = 25;
   int height = 6;
   int layerSize = input.length() / width / height;
@@ -23,51 +19,51 @@ void part1() {
   });
 
   std::string minLayer = counts.front().first;
-  std::cout << std::count(minLayer.begin(), minLayer.end(), '1') * std::count(minLayer.begin(), minLayer.end(), '2') << std::endl;
+  return std::count(minLayer.begin(), minLayer.end(), '1') * std::count(minLayer.begin(), minLayer.end(), '2');
 }
 
-void part2() {
-  int width = 25;
-  int height = 6;
-  std::vector<char> image(width * height, '2');
-  std::vector<char> layer(width * height);
-  std::ifstream in("input.txt");
-  char ch;
-  if (in.is_open()) {
-    while (in.good() && !in.eof()) {
-      for (int i = 0; i < width * height; i++) {
-        in >> ch;
-        switch (ch) {
-          case '0':
-            layer[i] = ch;
-            break;
-          case '1':
-            layer[i] = ch;
-            break;
-          case '2':
-            layer[i] = ch;
-            break;
-          default:
-            break;
-        }
-        if (image[i] == '2') {
-          image[i] = layer[i];
-        }
-      }
+void _print(const std::vector<char>& image, int width, int height) {
+  for (size_t i = 0; i < width * height; i++) {
+    std::cout << (image[i] == '1' ? '@' : ' ');
+    if (i % width == width - 1) {
+      std::cout << std::endl;
     }
-    for (size_t i = 0; i < width * height; i++) {
-      std::cout << (image[i] == '1' ? '@' : ' ');
-      if (i % width == width - 1) {
-        std::cout << std::endl;
-      }
-    }
-    std::cout << std::endl;
   }
+  std::cout << std::endl;
+}
+
+std::vector<char> part2(const std::string& input, int width, int height) {
+  int layerSize = width * height;
+  int layers = static_cast<int>(input.size()) / layerSize;
+  std::vector<char> image(layerSize, '2');
+
+  for (int p = 0; p < layerSize; ++p) {
+    for (int l = 0; l < layers; ++l) {
+      char ch = input[l * layerSize + p];
+      if (ch == '0' || ch == '1') {
+        image[p] = ch;
+        break;
+      }
+      // if ch == '2' continue to next layer
+    }
+  }
+
+  return image;
 }
 
 int main(int argc, char** argv) {
-  part1();
+  auto line = read_line("day8/input.txt");
 
-  part2();
+  {
+    auto [result, ms] = measure_ms(part1, line);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, line, 25, 6);
+    _print(result, 25, 6);
+    std::cout << std::format("- elapsed : {} ms\n", ms);
+  }
+
   return 0;
 }

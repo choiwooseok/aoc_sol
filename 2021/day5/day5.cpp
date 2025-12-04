@@ -1,8 +1,9 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
 #include <array>
 #include <limits>
+#include <format>
+
+#include "../util.h"
 
 static std::string substringBefore(const std::string& str, const std::string& separator) {
   if (str.empty() || separator.empty()) {
@@ -21,7 +22,7 @@ static std::string substringAfter(const std::string& str, const std::string& sep
   return str.find(separator) == std::string::npos ? "" : str.substr(str.find(separator) + separator.length());
 }
 
-std::vector<std::array<int, 4>> readInputs(const std::string& fileName) {
+std::vector<std::array<int, 4>> _parse(const std::string& fileName) {
   std::fstream inputs(fileName);
   std::vector<std::array<int, 4>> data;
 
@@ -40,15 +41,6 @@ std::vector<std::array<int, 4>> readInputs(const std::string& fileName) {
   return data;
 }
 
-void printDiagram(std::vector<std::vector<int>>& diagram) {
-  for (auto row : diagram) {
-    for (int col : row) {
-      std::cout << col << " ";
-    }
-    std::cout << std::endl;
-  }
-}
-
 int countOverlap(std::vector<std::vector<int>>& diagram) {
   int cnt = 0;
   for (auto row : diagram) {
@@ -61,7 +53,7 @@ int countOverlap(std::vector<std::vector<int>>& diagram) {
   return cnt;
 }
 
-void part1(std::vector<std::array<int, 4>>& data) {
+int part1(std::vector<std::array<int, 4>>& data) {
   int w = std::numeric_limits<int>::min();
   int h = std::numeric_limits<int>::min();
   for (auto line : data) {
@@ -72,7 +64,6 @@ void part1(std::vector<std::array<int, 4>>& data) {
     w = std::max(x2, std::max(w, x1));
     h = std::max(y2, std::max(h, y1));
   }
-  std::cout << w << " " << h << std::endl;
 
   std::vector<std::vector<int>> diagram(h + 1, std::vector<int>(w + 1, 0));
   for (auto line : data) {
@@ -98,11 +89,10 @@ void part1(std::vector<std::array<int, 4>>& data) {
     }
   }
 
-  // printDiagram(diagram);
-  std::cout << countOverlap(diagram) << std::endl;
+  return countOverlap(diagram);
 }
 
-void part2(std::vector<std::array<int, 4>>& data) {
+int part2(std::vector<std::array<int, 4>>& data) {
   int w = std::numeric_limits<int>::min();
   int h = std::numeric_limits<int>::min();
   for (auto line : data) {
@@ -113,7 +103,6 @@ void part2(std::vector<std::array<int, 4>>& data) {
     w = std::max(x2, std::max(w, x1));
     h = std::max(y2, std::max(h, y1));
   }
-  std::cout << w << " " << h << std::endl;
 
   std::vector<std::vector<int>> diagram(h + 1, std::vector<int>(w + 1, 0));
   for (auto line : data) {
@@ -171,13 +160,21 @@ void part2(std::vector<std::array<int, 4>>& data) {
     }
   }
 
-  // printDiagram(diagram);
-  std::cout << countOverlap(diagram) << std::endl;
+  return countOverlap(diagram);
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::array<int, 4>> data = readInputs("day5_input.txt");
-  part1(data);
-  part2(data);
+  std::vector<std::array<int, 4>> data = _parse("day5/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

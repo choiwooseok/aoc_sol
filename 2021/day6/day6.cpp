@@ -4,12 +4,12 @@
 #include <array>
 #include <numeric>
 #include <algorithm>
+#include "../util.h"
 
-std::vector<int> readInputs(const std::string& fileName) {
+std::vector<int> _parse(const std::string& fileName) {
   std::fstream inputs(fileName);
   std::vector<int> data;
 
-  std::string line;
   std::string temp;
   while (getline(inputs, temp, ',')) {
     data.push_back(std::stoi(temp));
@@ -41,7 +41,7 @@ void part1(std::vector<int>& data, int& days) {
   }
 }
 
-void part2(std::vector<int>& data, int days) {
+int64_t part2(std::vector<int>& data, int days) {
   std::array<int64_t, 9> lanternfish = {
       0ll,
   };
@@ -55,14 +55,21 @@ void part2(std::vector<int>& data, int days) {
     lanternfish[6] += creation;
   }
 
-  std::cout << std::accumulate(lanternfish.begin(), lanternfish.end(), 0ll) << std::endl;
+  return std::accumulate(lanternfish.begin(), lanternfish.end(), 0ll);
 }
 
 int main(int argc, char** argv) {
-  // std::vector<int> data = readInputs("day6_test.txt");
-  std::vector<int> data = readInputs("day6_input.txt");
-  part2(data, 18);
-  part2(data, 80);
-  part2(data, 256);
+  std::vector<int> data = _parse("day6/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part2, data, 80);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data, 256);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

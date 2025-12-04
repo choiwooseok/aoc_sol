@@ -1,12 +1,12 @@
 #include <iostream>
-#include <iomanip>
-#include <fstream>
 #include <sstream>
-#include <vector>
 #include <queue>
+#include <format>
 #include <algorithm>
 
-std::vector<std::string> readInputs(const std::string& fileName) {
+#include "../util.h"
+
+std::vector<std::string> _parse(const std::string& fileName) {
   std::fstream inputs(fileName);
   std::vector<std::string> data;
 
@@ -37,16 +37,6 @@ void dataManipulate(std::vector<std::string>& data, std::queue<std::string>& dra
   }
 }
 
-void printBoard(std::vector<std::vector<std::pair<std::string, bool> > >& board) {
-  for (auto row : board) {
-    for (auto col : row) {
-      std::cout << std::setw(10) << col.first << " " << std::setw(10) << std::boolalpha << col.second << " ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-}
-
 int getUnmarkedSum(const std::vector<std::vector<std::pair<std::string, bool> > >& winningBoard) {
   int unmarkedSum = 0;
   for (auto& row : winningBoard) {
@@ -59,7 +49,7 @@ int getUnmarkedSum(const std::vector<std::vector<std::pair<std::string, bool> > 
   return unmarkedSum;
 }
 
-void part1(std::vector<std::string>& data) {
+int part1(std::vector<std::string>& data) {
   std::queue<std::string> drawNumbersQueue;
   std::vector<std::vector<std::vector<std::pair<std::string, bool> > > > boards;
 
@@ -104,7 +94,6 @@ void part1(std::vector<std::string>& data) {
       }
       if (hasWinner) {
         winningBoard = board;
-        printBoard(winningBoard);
         break;
       }
     }
@@ -115,10 +104,10 @@ void part1(std::vector<std::string>& data) {
   }
 
   int unmarkedSum = getUnmarkedSum(winningBoard);
-  std::cout << "unmarkedSum : " << unmarkedSum << " last draw " << drawNumber << " mul : " << unmarkedSum * std::stoi(drawNumber) << std::endl;
+  return unmarkedSum * std::stoi(drawNumber);
 }
 
-void part2(std::vector<std::string>& data) {
+int part2(std::vector<std::string>& data) {
   std::queue<std::string> drawNumbersQueue;
   std::vector<std::vector<std::vector<std::pair<std::string, bool> > > > boards;
   dataManipulate(data, drawNumbersQueue, boards);
@@ -178,20 +167,27 @@ void part2(std::vector<std::string>& data) {
     }
 
     if (lastBoardFin) {
-      printBoard(lastBoard);
       break;
     }
     drawNumbersQueue.pop();
   }
 
   int unmarkedSum = getUnmarkedSum(lastBoard);
-  std::cout << "unmarkedSum : " << unmarkedSum << " last draw " << drawNumber << " mul : " << unmarkedSum * std::stoi(drawNumber) << std::endl;
+  return unmarkedSum * std::stoi(drawNumber);
 }
 
 int main(int argc, char** argv) {
-  // std::vector<std::string> data = readInputs("day4_test.txt");
-  std::vector<std::string> data = readInputs("day4_input.txt");
-  part1(data);
-  part2(data);
+  std::vector<std::string> data = _parse("day4/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

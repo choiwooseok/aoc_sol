@@ -1,46 +1,48 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
+#include <format>
+#include "../util.h"
 
-std::vector<int> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
+std::vector<int> _parse(const std::vector<std::string>& lines) {
   std::vector<int> data;
-
-  int curr = 0;
-  while (!inputs.eof()) {
-    inputs >> curr;
-    data.push_back(curr);
+  for (auto& line : lines) {
+    data.push_back(stoi(line));
   }
-  inputs.close();
   return data;
 }
 
-void part1(const std::vector<int>& data) {
+int part1(const std::vector<int>& data) {
   int ret = 0;
   for (int i = 0; i < data.size() - 1; i++) {
     if (data[i] < data[i + 1]) {
       ret++;
     }
   }
-  std::cout << ret << std::endl;
+  return ret;
 }
 
-void part2(const std::vector<int>& data) {
+int part2(const std::vector<int>& data) {
   int ret = 0;
   for (int i = 0; i < data.size() - 3; i++) {
-    if (data[i] + data[i + 1] + data[i + 2] < data[i + 1] + data[i + 2] + data[i + 3]) {
+    if (data[i] < data[i + 3]) {
       ret++;
     }
   }
-  std::cout << ret << std::endl;
+  return ret;
 }
 
 int main(int argc, char** argv) {
-  // std::vector<int> data = readInputs("day1_test.txt");
-  std::vector<int> data = readInputs("day1_input.txt");
+  auto lines = read_lines("day1/input.txt");
+  auto data = _parse(lines);
 
-  part1(data);
-  part2(data);
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
 
   return 0;
 }

@@ -1,7 +1,6 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <string>
+#include <format>
+#include "../util.h"
 
 class Claim {
  public:
@@ -12,12 +11,10 @@ class Claim {
   int h;
 };
 
-std::vector<Claim> read_lines(const std::string& fileName) {
-  std::fstream fs(fileName);
+std::vector<Claim> _parse(const std::vector<std::string>& lines) {
   std::vector<Claim> ret;
 
-  std::string line;
-  while (std::getline(fs, line)) {
+  for (auto& line : lines) {
     Claim c;
     c.id = line.substr(1, line.find('@') - 1);
     c.x = std::stoi(line.substr(line.find('@') + 1, line.find(',')));
@@ -28,7 +25,6 @@ std::vector<Claim> read_lines(const std::string& fileName) {
     ret.push_back(c);
   }
 
-  fs.close();
   return ret;
 }
 
@@ -86,8 +82,18 @@ std::string part2(const std::vector<Claim>& claims) {
 }
 
 int main(int argc, char** argv) {
-  auto claims = read_lines("input.txt");
-  std::cout << "part1 : " << part1(claims) << std::endl;
-  std::cout << "part2 : " << part2(claims) << std::endl;
+  auto lines = read_lines("day3/input.txt");
+  auto claims = _parse(lines);
+
+  {
+    auto [result, ms] = measure_ms(part1, claims);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, claims);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }
