@@ -1,0 +1,35 @@
+#!/bin/bash
+
+ranges=()
+ids=()
+while read -r line; do
+  if [[ -n "$line" ]]; then
+    if [[ "$line" == *'-'* ]]; then
+      ranges+=("$line")
+    else
+      ids+=("$line")
+    fi
+  fi
+done
+
+is-fresh() {
+  local id=$1
+  local range
+  for range in "${ranges[@]}"; do
+    local min max
+    IFS=- read -r min max <<< "$range"
+    if (( min <= id && id <= max )); then
+      return 0
+    fi
+  done
+  return 1
+}
+
+fresh=()
+for id in "${ids[@]}"; do
+  if is-fresh "$id"; then
+    fresh+=("$id")
+  fi
+done
+
+echo "found ${#fresh[@]} fresh ingredients"

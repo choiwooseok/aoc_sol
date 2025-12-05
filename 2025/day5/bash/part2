@@ -1,0 +1,52 @@
+#!/bin/bash
+
+ranges=()
+while read -r line; do
+  if [[ "$line" == *'-'* ]]; then
+    ranges+=("$line")
+  fi
+done
+
+merged_out=()
+merge-intervals() {
+  local arr=("$@")
+
+  [ "${#arr[@]}" -eq 0 ] && return 0
+
+  local s e cs ce
+  while IFS='-' read -r s e; do
+    if [[ -z $s || -z $e ]]; then
+      continue
+    fi
+    if [ -z "${cs+x}" ]; then
+      cs=$s
+      ce=$e
+      continue
+    fi
+
+    if (( s <= ce)); then
+      if (( e > ce )); then
+        ce=$e
+      fi
+    else
+      merged_out+=("${cs}-${ce}")
+      cs=$s
+      ce=$e
+    fi
+  done < <(printf '%s\n' "${arr[@]}" | sort -n)
+
+  merged_out+=("${cs}-${ce}")
+}
+
+merge-intervals "${ranges[@]}"
+
+total=0
+for range in "${merged_out[@]}"; do
+  IFS='-' read -r s e <<< "$range"
+  if [[ -z $s || -z $e ]]; then
+   continue
+  fi
+  len=$((e - s + 1))
+  total=$((total + len))
+done
+echo "$total"
