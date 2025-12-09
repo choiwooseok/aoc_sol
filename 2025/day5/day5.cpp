@@ -45,9 +45,10 @@ auto _parse(const std::vector<std::string>& lines) -> std::tuple<std::vector<std
   return {intervals, ids};
 }
 
-int part1(const std::vector<std::vector<uint64_t>>& intervals, const std::vector<uint64_t>& ids) {
-  int cnt = 0;
+int part1(const std::vector<std::string>& lines) {
+  auto [intervals, ids] = _parse(lines);
 
+  int cnt = 0;
   for (auto& id : ids) {
     for (auto& interval : intervals) {
       if (interval[0] <= id && id <= interval[1]) {
@@ -59,7 +60,9 @@ int part1(const std::vector<std::vector<uint64_t>>& intervals, const std::vector
   return cnt;
 }
 
-uint64_t part2(const std::vector<std::vector<uint64_t>>& intervals) {
+uint64_t part2(const std::vector<std::string>& lines) {
+  auto [intervals, ids] = _parse(lines);
+
   uint64_t cnt = 0;
   for (auto& interval : intervals) {
     cnt += interval[1] - interval[0] + 1;
@@ -69,15 +72,14 @@ uint64_t part2(const std::vector<std::vector<uint64_t>>& intervals) {
 
 int main(int argc, char** argv) {
   auto lines = read_lines("day5/input.txt");
-  auto [intervals, ids] = _parse(lines);
 
   {
-    auto [result, ms] = measure_ms(part1, intervals, ids);
+    auto [result, ms] = measure_ms(part1, lines);
     std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
   {
-    auto [result, ms] = measure_ms(part2, intervals);
+    auto [result, ms] = measure_ms(part2, lines);
     std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
   }
 
