@@ -49,18 +49,14 @@ uint64_t _part2(const std::unordered_map<std::string, std::vector<std::string>>&
                 bool fft,
                 bool dac) {
   std::string cache_key = from + "_" + std::to_string(fft) + "_" + std::to_string(dac);
-  if (cache.find(cache_key) != cache.end()) {
-    return cache[cache_key];
-  }
+  if (cache.count(cache_key)) return cache[cache_key];
 
   if (from == "fft") fft = true;
   if (from == "dac") dac = true;
 
   const auto outputs = nodes.at(from);
   if (std::find(outputs.begin(), outputs.end(), to) != outputs.end()) {
-    uint64_t result = (fft && dac) ? 1 : 0;
-    cache[cache_key] = result;
-    return result;
+    return (fft && dac) ? 1 : 0;
   }
 
   uint64_t cnt = 0;

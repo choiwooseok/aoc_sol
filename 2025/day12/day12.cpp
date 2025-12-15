@@ -15,13 +15,10 @@ class Region {
 class Present {
  public:
   int count() const {
-    int cnt = 0;
-    for (const auto& row : shape_) {
-      for (const auto& col : row) {
-        if (col == '#') cnt++;
-      }
-    }
-    return cnt;
+    return std::accumulate(shape_.begin(), shape_.end(), 0,
+                           [](int acc, const auto& row) {
+                             return acc + std::count(row.begin(), row.end(), '#');
+                           });
   }
 
  public:

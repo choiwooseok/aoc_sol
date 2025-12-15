@@ -5,40 +5,45 @@
 #include <set>
 #include <unordered_set>
 #include <unordered_map>
+#include <ranges>
 #include "../util.h"
 
 using Point = std::pair<int64_t, int64_t>;
+
+auto _parse_point = [](const std::string& line) -> Point {
+  auto arr = split(line, ",");
+  return {std::stoll(arr[0]), std::stoll(arr[1])};
+};
+
+auto _parse_points = [](const std::vector<std::string>& lines) {
+  return lines |
+         std::views::transform(_parse_point) |
+         [](auto rng) { return std::vector<Point>(rng.begin(), rng.end()); };
+};
+
+auto _max_rectangle_area = [](const std::vector<Point>& points) {
+  uint64_t max_area = 0;
+  for (size_t i = 0; i < points.size(); ++i) {
+    for (size_t j = i + 1; j < points.size(); ++j) {
+      uint64_t area = (std::llabs(points[i].first - points[j].first) + 1ULL) *
+                      (std::llabs(points[i].second - points[j].second) + 1ULL);
+      max_area = std::max(max_area, area);
+    }
+  }
+  return max_area;
+};
+
+uint64_t part1(const std::vector<std::string>& lines) {
+  return lines |
+         _parse_points |
+         _max_rectangle_area;
+}
 
 struct PointHash {
   size_t operator()(const Point& p) const {
     return std::hash<int64_t>()(p.first) ^ (std::hash<int64_t>()(p.second) << 1);
   }
 };
-
-std::vector<Point> _parse(const std::vector<std::string>& lines) {
-  std::vector<Point> points;
-  for (auto& line : lines) {
-    auto arr = split(line, ",");
-    points.push_back({std::stoll(arr[0]), std::stoll(arr[1])});
-  }
-  return points;
-}
-
-uint64_t part1(const std::vector<std::string>& lines) {
-  auto points = _parse(lines);
-
-  uint64_t maxArea = 0;
-  for (int i = 0; i < points.size(); i++) {
-    for (int j = i + 1; j < points.size(); j++) {
-      auto [ix, iy] = points[i];
-      auto [jx, jy] = points[j];
-
-      uint64_t area = (std::llabs(ix - jx) + 1) * (std::llabs(iy - jy) + 1);
-      maxArea = std::max(maxArea, area);
-    }
-  }
-  return maxArea;
-}
 
 class PolygonChecker {
  public:
@@ -121,7 +126,7 @@ class PolygonChecker {
 };
 
 uint64_t part2(const std::vector<std::string>& lines) {
-  auto points = _parse(lines);
+  auto points = _parse_points(lines);
   PolygonChecker checker(points);
 
   std::unordered_set<Point, PointHash> validPoints;

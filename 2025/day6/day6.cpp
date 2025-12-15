@@ -3,48 +3,44 @@
 #include <cmath>
 #include <numeric>
 #include <sstream>
+#include <ranges>
 
 #include "../util.h"
 
-std::vector<std::vector<std::string>> _transpose(const std::vector<std::vector<std::string>>& arr) {
-  int r = arr.size();
-  int c = arr.front().size();
-  std::vector<std::vector<std::string>> ret(c, std::vector<std::string>(r, ""));
+using Matrix = std::vector<std::vector<std::string>>;
+
+Matrix _transpose(const Matrix& mat) {
+  int r = mat.size();
+  int c = mat.front().size();
+  Matrix ret(c, std::vector<std::string>(r, ""));
   for (int i = 0; i < r; i++) {
     for (int j = 0; j < c; j++) {
-      ret[j][i] = arr[i][j];
+      ret[j][i] = mat[i][j];
     }
   }
   return ret;
 }
 
-std::vector<std::vector<std::string>> _parse_col(const std::vector<std::string>& lines) {
-  std::vector<std::vector<std::string>> arr;
+Matrix _parse_col(const std::vector<std::string>& lines) {
+  Matrix mat;
   for (auto& line : lines) {
     std::vector<std::string> row;
     std::stringstream ss(line);
-    while (!ss.eof()) {
-      std::string elem;
-      ss >> elem;
-      row.push_back(elem);
-    }
-    arr.push_back(row);
+    std::string elem;
+    while (ss >> elem) row.push_back(elem);
+    mat.push_back(row);
   }
 
-  return _transpose(arr);
+  return _transpose(mat);
 }
 
 void _remove_space(std::string& str) {
-  while (str.starts_with(' ')) {
-    str = str.substr(1);
-  }
-  while (str.ends_with(' ')) {
-    str.pop_back();
-  }
+  while (str.ends_with(' ')) str.pop_back();
+  while (str.starts_with(' ')) str = str.substr(1);
 }
 
-std::vector<std::vector<std::string>> _parse_rtl(const std::vector<std::string>& lines) {
-  std::vector<std::vector<std::string>> arr;
+Matrix _parse_rtl(const std::vector<std::string>& lines) {
+  Matrix mat;
 
   std::vector<std::string> cols(lines.front().size());
   for (int j = 0; j < lines.front().size(); j++) {
@@ -54,63 +50,62 @@ std::vector<std::vector<std::string>> _parse_rtl(const std::vector<std::string>&
   }
   std::reverse(cols.begin(), cols.end());
 
-  std::vector<std::string> elems;
+  std::vector<std::string> row;
   for (auto& col : cols) {
     std::string op = "";
-    if (col.ends_with('*')) {
-      op = "*";
-    } else if (col.ends_with('+')) {
-      op = "+";
-    }
-
-    if (!op.empty()) {
-      col.pop_back();
-    }
+    if (col.ends_with('*')) op = "*";
+    if (col.ends_with('+')) op = "+";
+    if (!op.empty()) col.pop_back();
 
     _remove_space(col);
 
     if (!col.empty()) {
-      elems.push_back(col);
+      row.push_back(col);
     }
 
     if (!op.empty()) {
-      elems.push_back(op);
-      arr.push_back(elems);
-      elems.clear();
+      row.push_back(op);
+      mat.push_back(row);
+      row.clear();
     }
   }
 
-  return arr;
+  return mat;
 }
 
-uint64_t _calc(const std::vector<std::vector<std::string>>& arr) {
-  uint64_t ret = 0;
-  for (int i = 0; i < arr.size(); i++) {
-    std::string op = arr[i].back();
+auto _calc = [](const Matrix& mat) -> uint64_t {
+  return mat |
+         std::views::transform([](const auto& col) {
+           char op = col.back()[0];
+           auto values = col | std::views::take(col.size() - 1);
 
-    if (op == "*") {
-      ret += std::accumulate(arr[i].begin(), arr[i].end() - 1,
-                             1ULL,
-                             [](uint64_t acc, const std::string& str) {
-                               return acc * std::stoull(str);
-                             });
-    } else if (op == "+") {
-      ret += std::accumulate(arr[i].begin(), arr[i].end() - 1,
-                             0ULL,
-                             [](uint64_t acc, const std::string& str) {
-                               return acc + std::stoull(str);
-                             });
-    }
-  }
-  return ret;
-}
+           if (op == '*') {
+             return std::accumulate(values.begin(), values.end(), 1ULL,
+                                    [](uint64_t acc, const std::string& s) {
+                                      return acc * std::stoull(s);
+                                    });
+           } else {  // op == '+'
+             return std::accumulate(values.begin(), values.end(), 0ULL,
+                                    [](uint64_t acc, const std::string& s) {
+                                      return acc + std::stoull(s);
+                                    });
+           }
+         }) |
+         [](auto rng) {
+           return std::accumulate(rng.begin(), rng.end(), 0ULL);
+         };
+};
 
 uint64_t part1(const std::vector<std::string>& lines) {
-  return _calc(_parse_col(lines));
+  return lines |
+         _parse_col |
+         _calc;
 }
 
 uint64_t part2(const std::vector<std::string>& lines) {
-  return _calc(_parse_rtl(lines));
+  return lines |
+         _parse_rtl |
+         _calc;
 }
 
 int main(int argc, char** argv) {

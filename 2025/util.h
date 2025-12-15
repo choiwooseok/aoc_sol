@@ -6,6 +6,12 @@
 #include <fstream>
 #include <string>
 
+template <typename T, typename F>
+auto operator|(T&& arg, F&& func)
+    -> decltype(std::invoke(std::forward<F>(func), std::forward<T>(arg))) {
+  return std::invoke(std::forward<F>(func), std::forward<T>(arg));
+}
+
 std::vector<std::string> read_lines(const std::string& fileName) {
   std::fstream fs(fileName);
   std::vector<std::string> lines;

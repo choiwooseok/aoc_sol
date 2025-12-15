@@ -15,7 +15,7 @@ std::string _removeBraces(const std::string& str) {
 }
 
 auto _parse(const std::vector<std::string>& lines) {
-  std::vector<std::tuple<std::string, std::vector<std::string>, std::vector<int>>> tuples;
+  std::vector<std::tuple<std::string, std::vector<std::string>, std::vector<int>>> machines;
 
   for (auto& line : lines) {
     auto arr = split(line, " ");
@@ -49,9 +49,9 @@ auto _parse(const std::vector<std::string>& lines) {
       }
     }
 
-    tuples.push_back({light_diagram, wiring_shematics, joltage_requirements});
+    machines.push_back({light_diagram, wiring_shematics, joltage_requirements});
   }
-  return tuples;
+  return machines;
 }
 
 int _backtrack(int current_state,

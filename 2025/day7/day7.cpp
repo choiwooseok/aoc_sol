@@ -2,31 +2,45 @@
 #include <format>
 #include <queue>
 #include <map>
+#include <ranges>
 
 #include "../util.h"
 
-std::vector<std::vector<char>> _grid(const std::vector<std::string>& lines) {
-  int r = lines.size();
-  int c = lines.front().size();
-  std::vector<std::vector<char>> grid(r, std::vector<char>(c, '.'));
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < c; j++) {
-      grid[i][j] = lines[i][j];
+using Grid = std::vector<std::vector<char>>;
+using Point = std::pair<int, int>;
+
+auto _grid = [](const std::vector<std::string>& lines) -> Grid {
+  return lines |
+         std::views::transform([](const std::string& line) {
+           return std::vector<char>(line.begin(), line.end());
+         }) |
+         [](auto rng) { return Grid(rng.begin(), rng.end()); };
+};
+
+auto _find_start = [](const Grid& grid) -> Point {
+  int rows = grid.size();
+  int cols = grid[0].size();
+
+  for (int r = 0; r < rows; ++r) {
+    for (int c = 0; c < cols; ++c) {
+      if (grid[r][c] == 'S') return {r, c};
     }
   }
-  return grid;
-}
+  return {-1, -1};
+};
 
 bool isSafe(int y, int x, int r, int c) {
   return y >= 0 && y < r && x >= 0 && x < c;
 }
 
-void _part1(std::vector<std::vector<char>>& grid, const std::pair<int, int>& start, int& cnt) {
+auto count_obstacles_bfs = [](const Grid& grid, Point start) {
   int r = grid.size();
   int c = grid.front().size();
   std::vector<std::vector<bool>> visited(r, std::vector<bool>(c, false));
 
-  std::queue<std::pair<int, int>> q;
+  uint64_t cnt = 0;
+
+  std::queue<Point> q;
   q.push(start);
 
   while (!q.empty()) {
@@ -35,9 +49,6 @@ void _part1(std::vector<std::vector<char>>& grid, const std::pair<int, int>& sta
 
     if (isSafe(cy, cx, r, c) && visited[cy][cx] == false) {
       visited[cy][cx] = true;
-      if (grid[cy][cx] == '.') {
-        grid[cy][cx] = '|';
-      }
 
       if (grid[cy][cx] == '^') {
         cnt++;
@@ -48,66 +59,39 @@ void _part1(std::vector<std::vector<char>>& grid, const std::pair<int, int>& sta
       }
     }
   }
-}
+  return cnt;
+};
 
 int part1(const std::vector<std::string>& lines) {
   auto grid = _grid(lines);
-  int r = grid.size();
-  int c = grid.front().size();
+  auto start = _find_start(grid);
+  return count_obstacles_bfs(grid, start);
+}
 
-  int cnt = 0;
+auto count_paths_dp = [](const Grid& grid, Point start) -> uint64_t {
+  int rows = grid.size();
+  int cols = grid[0].size();
+  std::vector<std::vector<uint64_t>> dp(rows, std::vector<uint64_t>(cols, 0));
 
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < c; j++) {
-      if (grid[i][j] == 'S') {
-        _part1(grid, {i, j}, cnt);
-        break;
+  for (int c = 0; c < cols; ++c) dp[rows - 1][c] = 1;
+
+  for (int r = rows - 2; r >= 0; --r) {
+    for (int c = 0; c < cols; ++c) {
+      if (grid[r][c] == '^') {
+        if (c > 0) dp[r][c] += dp[r + 1][c - 1];
+        if (c < cols - 1) dp[r][c] += dp[r + 1][c + 1];
+      } else {
+        dp[r][c] = dp[r + 1][c];
       }
     }
   }
-
-  return cnt;
-}
+  return dp[start.first][start.second];
+};
 
 uint64_t part2(const std::vector<std::string>& lines) {
   auto grid = _grid(lines);
-  int r = grid.size();
-  int c = grid.front().size();
-
-  std::vector<std::vector<uint64_t>> dp(r, std::vector<uint64_t>(c, 0ULL));
-  for (int i = 0; i < c; i++) {
-    dp[r - 1][i] = 1ULL;
-  }
-
-  for (int i = r - 2; i >= 0; i--) {
-    for (int j = 0; j < c; j++) {
-      if (grid[i][j] == '^') {
-        dp[i][j] = 0ULL;
-
-        // left
-        if (j - 1 >= 0) {
-          dp[i][j] += dp[i + 1][j - 1];
-        }
-
-        // right
-        if (j + 1 < c) {
-          dp[i][j] += dp[i + 1][j + 1];
-        }
-      } else {
-        dp[i][j] = dp[i + 1][j];
-      }
-    }
-  }
-
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < c; j++) {
-      if (grid[i][j] == 'S') {
-        return dp[i][j];
-      }
-    }
-  }
-
-  return 0;
+  auto start = _find_start(grid);
+  return count_paths_dp(grid, start);
 }
 
 int main(int argc, char** argv) {
