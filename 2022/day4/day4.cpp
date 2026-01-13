@@ -2,37 +2,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "../util.h"
 
-std::vector<std::string> split(const std::string& source, const std::string& delim) {
-  size_t pos_start = 0, pos_end, delim_len = delim.length();
-  std::vector<std::string> res;
-
-  while ((pos_end = source.find(delim, pos_start)) != std::string::npos) {
-    std::string token = source.substr(pos_start, pos_end - pos_start);
-    pos_start = pos_end + delim_len;
-    res.push_back(token);
-  }
-
-  res.push_back(source.substr(pos_start));
-  return res;
-}
-
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
-  std::string line;
-  while (!inputs.eof()) {
-    std::getline(inputs, line);
-    data.push_back(line);
-  }
-  inputs.close();
-  return data;
-}
-
-void part1(const std::vector<std::string>& data) {
+int part1(const std::vector<std::string>& lines) {
   int cnt = 0;
-  for (auto& elem : data) {
+  for (auto& elem : lines) {
     auto pairs = split(elem, ",");
     auto l = split(pairs[0], "-");
     auto r = split(pairs[1], "-");
@@ -67,12 +41,12 @@ void part1(const std::vector<std::string>& data) {
       cnt++;
     }
   }
-  std::cout << cnt << std::endl;
+  return cnt;
 }
 
-void part2(const std::vector<std::string>& data) {
+int part2(const std::vector<std::string>& lines) {
   int cnt = 0;
-  for (auto& elem : data) {
+  for (auto& elem : lines) {
     auto pairs = split(elem, ",");
     auto l = split(pairs[0], "-");
     auto r = split(pairs[1], "-");
@@ -104,12 +78,21 @@ void part2(const std::vector<std::string>& data) {
       cnt++;
     }
   }
-  std::cout << cnt << std::endl;
+  return cnt;
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::string> data = readInputs("input.txt");
-  part1(data);
-  part2(data);
+  auto lines = read_lines("day4/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, lines);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, lines);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

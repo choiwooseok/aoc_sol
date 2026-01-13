@@ -3,31 +3,22 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_set>
+#include "../util.h"
 
-std::string readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-
-  std::string line;
-  while (!inputs.eof()) {
-    std::getline(inputs, line);
-  }
-  return line;
-}
-
-void part1(const std::string& data) {
+int part1(const std::string& data) {
   for (int i = 0; i < data.length() - 3; i++) {
     std::unordered_set<char> set;
     for (int j = 0; j < 4; j++) {
       set.insert(data[i + j]);
     }
     if (set.size() == 4) {
-      std::cout << i + 4 << std::endl;
-      break;
+      return i + 4;
     }
   }
+  return -1;
 }
 
-void part2(const std::string& data) {
+int part2(const std::string& data) {
   for (int i = 0; i < data.length() - 13; i++) {
     std::unordered_set<char> set;
     for (int j = 0; j < 14; j++) {
@@ -35,15 +26,24 @@ void part2(const std::string& data) {
     }
 
     if (set.size() == 14) {
-      std::cout << i + 14 << std::endl;
-      break;
+      return i + 14;
     }
   }
+  return -1;
 }
 
 int main(int argc, char** argv) {
-  std::string data = readInputs("input.txt");
-  part1(data);
-  part2(data);
+  auto data = read_line("day6/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

@@ -2,19 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
-  std::string line;
-  while (!inputs.eof()) {
-    std::getline(inputs, line);
-    data.push_back(line);
-  }
-  inputs.close();
-  return data;
-}
+#include "../util.h"
 
 int getPriorities(char ch) {
   if ('a' <= ch && ch <= 'z') {
@@ -24,9 +12,9 @@ int getPriorities(char ch) {
   }
 }
 
-void part1(const std::vector<std::string>& data) {
+int part1(const std::vector<std::string>& lines) {
   int ret = 0;
-  for (auto& line : data) {
+  for (auto& line : lines) {
     std::string elem0 = line.substr(0, line.length() / 2);
     std::string elem1 = line.substr(line.length() / 2);
 
@@ -38,15 +26,15 @@ void part1(const std::vector<std::string>& data) {
     }
   }
 
-  std::cout << ret << std::endl;
+  return ret;
 }
 
-void part2(const std::vector<std::string>& data) {
+int part2(const std::vector<std::string>& lines) {
   int ret = 0;
-  for (int i = 0; i < data.size(); i += 3) {
-    for (char ch : data[i]) {
-      if (std::find(data[i + 1].begin(), data[i + 1].end(), ch) != data[i + 1].end()) {
-        if (std::find(data[i + 2].begin(), data[i + 2].end(), ch) != data[i + 2].end()) {
+  for (int i = 0; i < lines.size(); i += 3) {
+    for (char ch : lines[i]) {
+      if (std::find(lines[i + 1].begin(), lines[i + 1].end(), ch) != lines[i + 1].end()) {
+        if (std::find(lines[i + 2].begin(), lines[i + 2].end(), ch) != lines[i + 2].end()) {
           ret += getPriorities(ch);
           break;
         }
@@ -54,12 +42,21 @@ void part2(const std::vector<std::string>& data) {
     }
   }
 
-  std::cout << ret << std::endl;
+  return ret;
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::string> data = readInputs("input.txt");
-  part1(data);
-  part2(data);
+  auto lines = read_lines("day3/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, lines);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, lines);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "../util.h"
 
 enum class RSP {
   R,
@@ -9,14 +10,11 @@ enum class RSP {
   S
 };
 
-std::vector<std::pair<RSP, RSP>> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
+std::vector<std::pair<RSP, RSP>> readInputs(const std::vector<std::string>& lines) {
   std::vector<std::pair<RSP, RSP>> data;
 
-  std::string curr;
-  int temp_sum = 0;
-  while (!inputs.eof()) {
-    std::getline(inputs, curr);
+  for (const auto& curr : lines) {
+    if (curr.empty()) continue;
     if (curr[0] == 'A') {
       if (curr[2] == 'X') {
         data.push_back({RSP::R, RSP::R});
@@ -51,11 +49,10 @@ std::vector<std::pair<RSP, RSP>> readInputs(const std::string& fileName) {
       }
     }
   }
-  inputs.close();
   return data;
 }
 
-void part1(const std::vector<std::pair<RSP, RSP>>& data) {
+int part1(const std::vector<std::pair<RSP, RSP>>& data) {
   int ret = 0;
   for (auto& elem : data) {
     int r = static_cast<int>(elem.second) + 1;
@@ -107,10 +104,10 @@ void part1(const std::vector<std::pair<RSP, RSP>>& data) {
     ret += r;
   }
 
-  std::cout << ret << std::endl;
+  return ret;
 }
 
-void part2(const std::vector<std::pair<RSP, RSP>>& data) {
+int part2(const std::vector<std::pair<RSP, RSP>>& data) {
   int ret = 0;
   for (auto& elem : data) {
     int r = 0;
@@ -170,14 +167,22 @@ void part2(const std::vector<std::pair<RSP, RSP>>& data) {
     ret += r;
   }
 
-  std::cout << ret << std::endl;
+  return ret;
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::pair<RSP, RSP>> data = readInputs("input.txt");
+  auto lines = read_lines("day2/input.txt");
+  auto data = readInputs(lines);
 
-  part1(data);
-  part2(data);
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
 
   return 0;
 }

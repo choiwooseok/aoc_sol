@@ -2,40 +2,46 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "../util.h"
 
-std::vector<int> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
+std::vector<int> readInputs(const std::vector<std::string>& lines) {
   std::vector<int> data;
 
-  std::string curr;
   int temp_sum = 0;
-  while (!inputs.eof()) {
-    std::getline(inputs, curr);
-    if (curr != "") {
-      temp_sum += std::stoi(curr);
+  for (const auto& line : lines) {
+    if (line != "") {
+      temp_sum += std::stoi(line);
     } else {
       data.push_back(temp_sum);
       temp_sum = 0;
     }
   }
-  inputs.close();
+  if (temp_sum > 0) data.push_back(temp_sum);
   return data;
 }
 
-void part1(const std::vector<int>& data) {
-  std::cout << *std::max_element(data.begin(), data.end()) << std::endl;
+int part1(const std::vector<int>& data) {
+  return *std::max_element(data.begin(), data.end());
 }
 
-void part2(std::vector<int>& data) {
+int part2(std::vector<int> data) {
   std::sort(data.begin(), data.end(), std::greater<int>());
-  std::cout << (data[0] + data[1] + data[2]) << std::endl;
+  return data[0] + data[1] + data[2];
 }
 
 int main(int argc, char** argv) {
-  std::vector<int> data = readInputs("input.txt");
+  auto lines = read_lines("day1/input.txt");
+  auto data = readInputs(lines);
 
-  part1(data);
-  part2(data);
+  {
+    auto [result, ms] = measure_ms(part1, data);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, data);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
 
   return 0;
 }

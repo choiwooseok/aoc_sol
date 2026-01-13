@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <stack>
+#include "../util.h"
 
 static std::string substringBefore(const std::string& str, const std::string& separator) {
   if (str.empty() || separator.empty()) {
@@ -19,19 +20,6 @@ static std::string substringAfter(const std::string& str, const std::string& sep
     return "";
   }
   return str.find(separator) == std::string::npos ? "" : str.substr(str.find(separator) + separator.length());
-}
-
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
-  std::string line;
-  while (!inputs.eof()) {
-    std::getline(inputs, line);
-    data.push_back(line);
-  }
-  inputs.close();
-  return data;
 }
 
 //             [G] [W]         [Q]
@@ -149,7 +137,7 @@ std::vector<std::stack<char>> initialState() {
   return sts;
 }
 
-void part1(const std::vector<std::string>& data) {
+std::string part1(const std::vector<std::string>& data) {
   auto sts = initialState();
   for (auto line : data) {
     int popcnt = std::stoi(substringAfter(substringBefore(line, "from"), "move "));
@@ -162,13 +150,14 @@ void part1(const std::vector<std::string>& data) {
     }
   }
 
+  std::string result;
   for (auto st : sts) {
-    std::cout << st.top();
+    result += st.top();
   }
-  std::cout << std::endl;
+  return result;
 }
 
-void part2(const std::vector<std::string>& data) {
+std::string part2(const std::vector<std::string>& data) {
   auto sts = initialState();
   for (auto line : data) {
     int popcnt = std::stoi(substringAfter(substringBefore(line, "from"), "move "));
@@ -187,15 +176,25 @@ void part2(const std::vector<std::string>& data) {
     }
   }
 
+  std::string result;
   for (auto st : sts) {
-    std::cout << st.top();
+    result += st.top();
   }
-  std::cout << std::endl;
+  return result;
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::string> data = readInputs("input.txt");
-  part1(data);
-  part2(data);
+  auto lines = read_lines("day5/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, lines);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, lines);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }

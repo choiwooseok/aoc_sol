@@ -3,20 +3,8 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
-
-std::vector<std::string> split(const std::string& source, const std::string& delim) {
-  size_t pos_start = 0, pos_end, delim_len = delim.length();
-  std::vector<std::string> res;
-
-  while ((pos_end = source.find(delim, pos_start)) != std::string::npos) {
-    std::string token = source.substr(pos_start, pos_end - pos_start);
-    pos_start = pos_end + delim_len;
-    res.push_back(token);
-  }
-
-  res.push_back(source.substr(pos_start));
-  return res;
-}
+#include <memory>
+#include "../util.h"
 
 bool starts_with(const std::string& src, const std::string& starting) {
   return src.length() >= starting.length() ? (0 == src.compare(0, starting.length(), starting)) : false;
@@ -48,19 +36,6 @@ class Node {
   std::string name;
   int64_t size{0};
 };
-
-std::vector<std::string> readInputs(const std::string& fileName) {
-  std::fstream inputs(fileName);
-  std::vector<std::string> data;
-
-  std::string line;
-  while (!inputs.eof()) {
-    std::getline(inputs, line);
-    data.push_back(line);
-  }
-  inputs.close();
-  return data;
-}
 
 int64_t init_size(std::shared_ptr<Node> node) {
   int64_t sum = 0;
@@ -119,11 +94,11 @@ void part1_helper(std::shared_ptr<Node> node, int64_t& sum) {
   }
 }
 
-void part1(const std::vector<std::string>& data) {
+int64_t part1(const std::vector<std::string>& data) {
   auto root = init_node(data);
   int64_t sum = 0;
   part1_helper(root, sum);
-  std::cout << sum << std::endl;
+  return sum;
 }
 
 void part2_helper(std::shared_ptr<Node> node, std::vector<int64_t>& possible, int64_t need) {
@@ -136,16 +111,25 @@ void part2_helper(std::shared_ptr<Node> node, std::vector<int64_t>& possible, in
   }
 }
 
-void part2(const std::vector<std::string>& data) {
+int64_t part2(const std::vector<std::string>& data) {
   auto root = init_node(data);
   std::vector<int64_t> possible;
   part2_helper(root, possible, root->size - 40000000);
-  std::cout << *std::min_element(possible.begin(), possible.end()) << std::endl;
+  return *std::min_element(possible.begin(), possible.end());
 }
 
 int main(int argc, char** argv) {
-  std::vector<std::string> data = readInputs("input.txt");
-  part1(data);
-  part2(data);
+  auto lines = read_lines("day7/input.txt");
+
+  {
+    auto [result, ms] = measure_ms(part1, lines);
+    std::cout << std::format("part1 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
+  {
+    auto [result, ms] = measure_ms(part2, lines);
+    std::cout << std::format("part2 : {}\n - elapsed : {} ms\n", result, ms);
+  }
+
   return 0;
 }
